@@ -1,0 +1,33 @@
+from flask import Flask
+from flask_cors import CORS
+from models import db
+from flask_migrate import Migrate
+from models.inicializar_db import inicializar_db
+from routes.auth import auth_bp
+from routes.perfil import perfil_bp
+from routes.alumno_routes import alumno_bp
+
+app = Flask(__name__)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:5328@localhost:5432/aulainteligente'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = 'clave_secreta_aula_inteligente'
+
+db.init_app(app)
+migrate = Migrate(app, db)
+CORS(app)
+
+with app.app_context():
+    inicializar_db()
+
+# RUTAS
+app.register_blueprint(auth_bp)
+app.register_blueprint(perfil_bp)
+app.register_blueprint(alumno_bp)
+
+@app.route('/')
+def inicio():
+    return '🎓 Aula Inteligente backend funcionando'
+
+if __name__ == '__main__':
+    app.run(debug=True)
